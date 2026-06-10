@@ -10,3 +10,5 @@ langchain-community
 langchain-ollama
 pydantic
 requests
+rich 
+prompt-toolkit

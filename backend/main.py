@@ -1,29 +1,8 @@
-from backend.agent.orchestrator import graph
+from backend.cli.interactive_cli import DockerAgentCLI
 
 
 def main():
-
-    while True:
-
-        query = input(
-            "\nDocker Agent > "
-        )
-
-        if query.lower() in (
-            "exit",
-            "quit"
-        ):
-            break
-
-        result = graph.invoke(
-            {
-                "query": query
-            }
-        )
-
-        print(
-            result["result"]
-        )
+    DockerAgentCLI().run()
 
 
 if __name__ == "__main__":
