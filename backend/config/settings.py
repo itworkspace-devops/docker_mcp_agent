@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     # MCP
     mcp_host: str = "192.168.29.225"
     mcp_port: int = 8001
+    
+    # API
+    
+    api_host: str = "0.0.0.0"
+    api_port: int = 8090
 
     # Docker
     # docker_host: str = "unix:///var/run/docker.sock"
