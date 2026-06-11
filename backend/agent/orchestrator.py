@@ -1,15 +1,37 @@
-from langgraph.graph import StateGraph
+from langgraph.graph import (
+    StateGraph,
+    END,
+)
 
-from .planner import planner
-from .executor import executor
-from .state import AgentState
+from backend.agent.state import (
+    AgentState
+)
 
+from backend.agent.planner import (
+    planner
+)
 
-builder = StateGraph(AgentState)
+from backend.agent.approval import (
+    approval_node
+)
 
+from backend.agent.executor import (
+    executor
+)
+
+builder = StateGraph(
+    AgentState
+)
+
+# Nodes
 builder.add_node(
     "planner",
     planner
+)
+
+builder.add_node(
+    "approval",
+    approval_node
 )
 
 builder.add_node(
@@ -17,17 +39,25 @@ builder.add_node(
     executor
 )
 
+# Entry Point
 builder.set_entry_point(
     "planner"
 )
 
+# Flow
 builder.add_edge(
     "planner",
+    "approval"
+)
+
+builder.add_edge(
+    "approval",
     "executor"
 )
 
-builder.set_finish_point(
-    "executor"
+builder.add_edge(
+    "executor",
+    END
 )
 
 graph = builder.compile()

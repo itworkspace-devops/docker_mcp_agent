@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8090
 
+    # Approval
+    approval_mode: str = "cli"
+
     # Docker
     # docker_host: str = "unix:///var/run/docker.sock"
     docker_host: str = "npipe:////./pipe/docker_engine"

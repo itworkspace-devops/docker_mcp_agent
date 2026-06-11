@@ -1,17 +1,45 @@
-import json
-
-from backend.agent import state
 from backend.client.mcp_client import MCPClient
+from backend.audit.logger import audit_log
 
 mcp = MCPClient()
 
 
 def executor(state):
 
-    # tool_data = json.loads(
-    #     state["tool_name"]
-    # )
-    
+    # Approval Check
+    if state.get(
+        "approval_required",
+        False
+    ):
+
+        if not state.get(
+            "approved",
+            False
+        ):
+
+            audit_log(
+                action=state.get(
+                    "tool_name",
+                    "unknown"
+                ),
+                target=str(
+                    state.get(
+                        "tool_args",
+                        {}
+                    )
+                ),
+                status="cancelled",
+            )
+
+            return {
+                "result": {
+                    "success": False,
+                    "message": (
+                        "Operation cancelled by user."
+                    ),
+                }
+            }
+
     tool_name = state["tool_name"]
 
     tool_args = state.get(
@@ -19,16 +47,34 @@ def executor(state):
         {}
     )
 
-    result = mcp.call(
-        tool_name,
-        tool_args
-    )
+    try:
 
-    # result = mcp.call(
-    #     tool_data["tool_name"],
-    #     tool_data["tool_args"]
-    # )
+        result = mcp.call(
+            tool_name,
+            tool_args
+        )
 
-    return {
-        "result": result
-    }
+        audit_log(
+            action=tool_name,
+            target=str(tool_args),
+            status="success",
+        )
+
+        return {
+            "result": result
+        }
+
+    except Exception as ex:
+
+        audit_log(
+            action=tool_name,
+            target=str(tool_args),
+            status=f"failed: {str(ex)}",
+        )
+
+        return {
+            "result": {
+                "success": False,
+                "error": str(ex),
+            }
+        }

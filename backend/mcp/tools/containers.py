@@ -45,6 +45,42 @@ def inspect_container(arguments):
     except Exception as ex:
 
         return failure(str(ex))
+    
+
+def run_container(arguments):
+
+    try:
+
+        docker_client = get_docker()
+
+        image = arguments["image"]
+
+        name = arguments.get(
+            "name"
+        )
+
+        detach = arguments.get(
+            "detach",
+            True
+        )
+
+        container = docker_client.containers.run(
+            image=image,
+            name=name,
+            detach=detach,
+        )
+
+        return success(
+            {
+                "id": container.short_id,
+                "name": container.name,
+                "image": image,
+            }
+        )
+
+    except Exception as ex:
+
+        return failure(str(ex))
 
 
 def start_container(arguments):

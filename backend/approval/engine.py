@@ -1,3 +1,5 @@
+import uuid
+
 DANGEROUS_TOOLS = {
 
     "docker_restart",
@@ -18,4 +20,11 @@ def requires_approval(
         tool_name
         in
         DANGEROUS_TOOLS
+    )
+
+
+def create_execution_id():
+
+    return str(
+        uuid.uuid4()
     )

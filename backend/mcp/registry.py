@@ -7,6 +7,7 @@ from .tools.containers import (
     remove_container,
     container_logs,
     container_stats,
+    run_container,
 )
 
 from .tools.images import (
@@ -42,6 +43,8 @@ TOOL_REGISTRY = {
     "docker_logs": container_logs,
 
     "docker_stats": container_stats,
+    
+    "docker_run": run_container,
 
     # ==================================================
     # Images

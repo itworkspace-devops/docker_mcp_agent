@@ -5,7 +5,10 @@ def route_query(query: str) -> Optional[dict]:
 
     query = query.lower().strip()
 
+    # ==================================================
     # Containers
+    # ==================================================
+
     if query in [
         "containers",
         "list containers",
@@ -18,48 +21,46 @@ def route_query(query: str) -> Optional[dict]:
             "tool_args": {}
         }
 
-    # Images
-    if query in [
-        "images",
-        "list images",
-        "show images",
-        "docker images",
-    ]:
+    # Create Container
+    if (
+        query.startswith("create ")
+        and "container" in query
+    ):
+
+        image = (
+            query
+            .replace("create", "")
+            .replace("container", "")
+            .strip()
+        )
+
         return {
-            "tool_name": "docker_images",
-            "tool_args": {}
+            "tool_name": "docker_run",
+            "tool_args": {
+                "image": image
+            }
         }
 
-    # Docker Info
-    if query in [
-        "docker info",
-        "info",
-        "system info",
-    ]:
-        return {
-            "tool_name": "docker_info",
-            "tool_args": {}
-        }
+    # Run Container
+    if (
+        query.startswith("create ")
+        and "container" in query
+    ):
 
-    # Docker Version
-    if query in [
-        "docker version",
-        "version",
-    ]:
-        return {
-            "tool_name": "docker_version",
-            "tool_args": {}
-        }
+        image = (
+            query
+            .replace("create", "")
+            .replace("container", "")
+            .replace("an", "")
+            .replace("a", "")
+            .strip()
+        )
 
-    # Docker Health
-    if query in [
-        "ping",
-        "health",
-        "docker health",
-    ]:
         return {
-            "tool_name": "docker_ping",
-            "tool_args": {}
+            "tool_name": "docker_run",
+            "tool_args": {
+                "image": image
+            }
         }
 
     # Restart Container
@@ -92,7 +93,7 @@ def route_query(query: str) -> Optional[dict]:
             }
         }
 
-    # Start Container
+    # Start Existing Container
     if query.startswith("start "):
 
         container = query.replace(
@@ -138,7 +139,21 @@ def route_query(query: str) -> Optional[dict]:
             }
         }
 
-    # Pull Image
+    # ==================================================
+    # Images
+    # ==================================================
+
+    if query in [
+        "images",
+        "list images",
+        "show images",
+        "docker images",
+    ]:
+        return {
+            "tool_name": "docker_images",
+            "tool_args": {}
+        }
+
     if query.startswith("pull "):
 
         image = query.replace(
@@ -153,7 +168,6 @@ def route_query(query: str) -> Optional[dict]:
             }
         }
 
-    # Remove Image
     if query.startswith("remove image "):
 
         image = query.replace(
@@ -167,6 +181,39 @@ def route_query(query: str) -> Optional[dict]:
                 "image": image,
                 "force": False
             }
+        }
+
+    # ==================================================
+    # Docker System
+    # ==================================================
+
+    if query in [
+        "docker info",
+        "info",
+        "system info",
+    ]:
+        return {
+            "tool_name": "docker_info",
+            "tool_args": {}
+        }
+
+    if query in [
+        "docker version",
+        "version",
+    ]:
+        return {
+            "tool_name": "docker_version",
+            "tool_args": {}
+        }
+
+    if query in [
+        "ping",
+        "health",
+        "docker health",
+    ]:
+        return {
+            "tool_name": "docker_ping",
+            "tool_args": {}
         }
 
     return None

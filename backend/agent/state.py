@@ -1,7 +1,8 @@
-from typing import TypedDict
+from typing import Any, Dict, Optional
+from typing_extensions import TypedDict
 
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
 
     query: str
 
@@ -9,6 +10,14 @@ class AgentState(TypedDict):
 
     tool_name: str
 
-    tool_args: dict
+    tool_args: Dict[str, Any]
 
-    result: str
+    result: Dict[str, Any]
+
+    error: Optional[str]
+
+    approval_required: bool
+
+    approved: bool
+
+    execution_id: str

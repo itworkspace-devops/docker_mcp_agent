@@ -12,6 +12,10 @@ from backend.api.routes.tools import (
     router as tools_router
 )
 
+from backend.api.routes.approval import (
+    router as approval_router
+)
+
 app = FastAPI(
     title="Docker AI Agent",
     version="1.0.0",
@@ -36,6 +40,12 @@ app.include_router(
     tools_router,
     prefix="/tools",
     tags=["Tools"],
+)
+
+app.include_router(
+    approval_router,
+    prefix="/approval",
+    tags=["Approval"]
 )
 
 
