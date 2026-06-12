@@ -7,9 +7,205 @@ from backend.database.models import (
     Finding,
     Remediation,
     Approval,
+    ContainerMetric,
+    DockerHost,
+    User,
+    ContainerBaseline,
 )
 
 import json
+
+
+def create_host(
+    name,
+    host,
+    port,
+):
+
+    db = SessionLocal()
+
+    try:
+
+        obj = DockerHost(
+            name=name,
+            host=host,
+            port=port,
+        )
+
+        db.add(obj)
+
+        db.commit()
+
+        db.refresh(obj)
+
+        return obj
+
+    finally:
+
+        db.close()
+        
+def get_hosts():
+
+    db = SessionLocal()
+
+    try:
+
+        return db.query(
+            DockerHost
+        ).all()
+
+    finally:
+
+        db.close()
+        
+def get_host_by_name(
+    name
+):
+
+    db = SessionLocal()
+
+    try:
+
+        return (
+            db.query(
+                DockerHost
+            )
+            .filter(
+                DockerHost.name == name
+            )
+            .first()
+        )
+
+    finally:
+
+        db.close()
+        
+        
+def get_user_by_username(
+    username
+):
+
+    db = SessionLocal()
+
+    try:
+
+        return (
+            db.query(User)
+            .filter(
+                User.username == username
+            )
+            .first()
+        )
+
+    finally:
+
+        db.close()
+
+def create_baseline(
+    container_name,
+    image,
+    restart_policy,
+):
+
+    db = SessionLocal()
+
+    try:
+
+        baseline = ContainerBaseline(
+
+            container_name=container_name,
+
+            image=image,
+
+            restart_policy=restart_policy,
+        )
+
+        db.add(
+            baseline
+        )
+
+        db.commit()
+
+        return baseline
+
+    finally:
+
+        db.close()
+        
+def get_baselines():
+
+    db = SessionLocal()
+
+    try:
+
+        return db.query(
+            ContainerBaseline
+        ).all()
+
+    finally:
+
+        db.close()
+
+def get_latest_metrics():
+
+    db = SessionLocal()
+
+    try:
+
+        return db.query(
+            ContainerMetric
+        ).order_by(
+            ContainerMetric.id.desc()
+        ).limit(
+            100
+        ).all()
+
+    finally:
+
+        db.close()
+
+
+def save_container_metric(
+    container_name,
+    status,
+    cpu_percent,
+    memory_mb,
+    host="local",
+):
+
+    db = SessionLocal()
+
+    try:
+
+        metric = ContainerMetric(
+
+            container_name=
+                container_name,
+
+            status=
+                status,
+
+            cpu_percent=
+                cpu_percent,
+
+            memory_mb=
+                memory_mb,
+
+            host=
+                host,
+        )
+
+        db.add(metric)
+
+        db.commit()
+
+        db.refresh(metric)
+
+        return metric
+
+    finally:
+
+        db.close()
 
 
 def save_remediation(

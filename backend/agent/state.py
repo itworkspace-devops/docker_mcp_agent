@@ -12,6 +12,8 @@ class AgentState(TypedDict, total=False):
     
     role: str
     
+    host_name: str | None
+    
     host: str
 
     tool_args: Dict[str, Any]

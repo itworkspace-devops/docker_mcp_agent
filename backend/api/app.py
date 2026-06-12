@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from backend.api.routes.docker_agent import (
     router as docker_router
 )
@@ -36,15 +38,100 @@ from backend.api.routes.remediation_execute import (
     router as remediation_execute_router
 )
 
+from backend.api.routes.monitoring import (
+    router as monitoring_router
+)
+
+from backend.monitoring.scheduler import (
+    start_scheduler
+)
+
+from backend.api.routes.dashboard import (
+    router as dashboard_router
+)
+
+from backend.api.routes.incidents import (
+    router as incidents_router
+)
+
+from backend.api.routes.hosts import (
+    router as hosts_router
+)
+
+from backend.api.routes.fleet import (
+    router as fleet_router
+)
+
+from backend.api.routes.drift import (
+    router as drift_router
+)
+
+from backend.api.routes.compliance import (
+    router as compliance_router
+)
+
 app = FastAPI(
     title="Docker AI Agent",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # tighten later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(
+
+    fleet_router,
+
+    prefix="/fleet",
+
+    tags=["Fleet"]
+)
+
+app.include_router(
+    compliance_router,
+    prefix="/compliance",
+    tags=["Compliance"]
+)
+
+app.include_router(
+    drift_router,
+    prefix="/drift",
+    tags=["Drift"]
+)
+
+app.include_router(
+    dashboard_router,
+    prefix="/dashboard",
+    tags=["Dashboard"]
+)
+
+app.include_router(
+    hosts_router,
+    prefix="/hosts",
+    tags=["Hosts"]
+)
+
+app.include_router(
+    incidents_router,
+    prefix="/incidents",
+    tags=["Incidents"]
 )
 
 app.include_router(
     watcher_router,
     prefix="/watcher",
     tags=["Watcher"]
+)
+
+app.include_router(
+    monitoring_router,
+    prefix="/monitoring",
+    tags=["Monitoring"]
 )
 
 app.include_router(
@@ -59,6 +146,7 @@ app.include_router(
     prefix="/docker-agent",
     tags=["Docker Agent"],
 )
+
 
 # System APIs
 app.include_router(
@@ -97,6 +185,15 @@ app.include_router(
     prefix="/remediation/execute",
     tags=["Remediation Execute"]
 )
+
+@app.on_event("startup")
+def startup_event():
+
+    start_scheduler()
+
+    print(
+        "Docker Monitoring Scheduler Started"
+    )
 
 @app.get("/health")
 def health():

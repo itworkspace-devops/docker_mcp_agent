@@ -4,7 +4,9 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
+    Float,
     DateTime,
+    Boolean,
     Text,
 )
 
@@ -33,6 +35,64 @@ class AuditLog(Base):
         default=datetime.utcnow,
     )
 
+class User(Base):
+
+    __tablename__ = "users"
+
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    username = Column(
+        String,
+        unique=True
+    )
+
+    password_hash = Column(
+        String
+    )
+
+    role = Column(
+        String
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+class ContainerBaseline(Base):
+
+    __tablename__ = "container_baselines"
+
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    container_name = Column(
+        String,
+        unique=True
+    )
+
+    image = Column(
+        String
+    )
+
+    restart_policy = Column(
+        String
+    )
+
+    expected_status = Column(
+        String,
+        default="running"
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
 
 class Finding(Base):
 
@@ -79,6 +139,58 @@ class Remediation(Base):
         default=datetime.utcnow,
     )
 
+class ContainerMetric(Base):
+
+    __tablename__ = "container_metrics"
+
+    id = Column(Integer, primary_key=True)
+
+    container_name = Column(String)
+
+    status = Column(String)
+
+    cpu_percent = Column(Float)
+
+    memory_mb = Column(Float)
+
+    host = Column(String)
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+class DockerHost(Base):
+
+    __tablename__ = "docker_hosts"
+
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    name = Column(
+        String,
+        unique=True
+    )
+
+    host = Column(
+        String
+    )
+
+    port = Column(
+        Integer
+    )
+
+    enabled = Column(
+        Boolean,
+        default=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
 
 class Approval(Base):
 

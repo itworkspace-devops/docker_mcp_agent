@@ -1,3 +1,5 @@
+from backend.mcp.tools.compliance import compliance_scan
+
 from .tools.containers import (
     list_containers,
     inspect_container,
@@ -20,6 +22,20 @@ from .tools.system import (
     docker_info,
     docker_ping,
     docker_version,
+)
+
+from .tools.monitoring import (
+    docker_metrics,
+    docker_top,
+    docker_unhealthy,
+)
+
+from .tools.incidents import (
+    incident_investigate
+)
+
+from .tools.drift import (
+    drift_scan
 )
 
 TOOL_REGISTRY = {
@@ -46,6 +62,9 @@ TOOL_REGISTRY = {
     
     "docker_run": run_container,
 
+    "incident_investigate":
+        incident_investigate,
+
     # ==================================================
     # Images
     # ==================================================
@@ -55,6 +74,27 @@ TOOL_REGISTRY = {
     "docker_pull": pull_image,
 
     "docker_rmi": remove_image,
+    
+    # =================================================
+    # Docker System
+    # =================================================
+    
+    # Monitoring
+
+    "docker_metrics":
+        docker_metrics,
+
+    "docker_top":
+        docker_top,
+
+    "docker_unhealthy":
+        docker_unhealthy,
+        
+    "drift_scan":
+        drift_scan,
+        
+    "compliance_scan":
+         compliance_scan,
 
     # ==================================================
     # System
