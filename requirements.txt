@@ -12,3 +12,7 @@ pydantic
 requests
 rich 
 prompt-toolkit
+apscheduler
+sqlalchemy
+psycopg2-binary
+alembic

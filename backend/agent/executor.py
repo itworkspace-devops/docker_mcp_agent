@@ -6,7 +6,30 @@ mcp = MCPClient()
 
 def executor(state):
 
+    # ==================================================
+    # Authorization Check
+    # ==================================================
+
+    if not state.get(
+        "authorized",
+        True
+    ):
+
+        return {
+            "result":
+                state.get(
+                    "result",
+                    {
+                        "success": False,
+                        "error": "Unauthorized"
+                    }
+                )
+        }
+
+    # ==================================================
     # Approval Check
+    # ==================================================
+
     if state.get(
         "approval_required",
         False
@@ -39,6 +62,10 @@ def executor(state):
                     ),
                 }
             }
+
+    # ==================================================
+    # Execute MCP Tool
+    # ==================================================
 
     tool_name = state["tool_name"]
 

@@ -19,8 +19,17 @@ from backend.agent.executor import (
     executor
 )
 
+from backend.agent.authorization import (
+    authorization_node
+)
+
 builder = StateGraph(
     AgentState
+)
+
+builder.add_node(
+    "authorization",
+    authorization_node
 )
 
 # Nodes

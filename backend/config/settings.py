@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     mcp_host: str = "192.168.29.225"
     mcp_port: int = 8001
     
+    database_url: str = (
+    "postgresql://postgres:postgres@localhost/docker_agent"
+)
+    
     # API
     
     api_host: str = "0.0.0.0"

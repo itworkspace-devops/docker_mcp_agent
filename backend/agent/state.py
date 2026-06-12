@@ -9,6 +9,10 @@ class AgentState(TypedDict, total=False):
     intent: str
 
     tool_name: str
+    
+    role: str
+    
+    host: str
 
     tool_args: Dict[str, Any]
 
