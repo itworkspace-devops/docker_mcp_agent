@@ -28,25 +28,33 @@ export default function Dashboard() {
     const [loading, setLoading] =
         useState(true);
 
+    const [error, setError] =
+        useState<string | null>(null);
+
     const loadSummary = async () => {
 
         try {
+
+            setError(null);
 
             const res =
                 await api.get(
                     "/dashboard/summary"
                 );
 
+            console.log("Dashboard summary response:", res.data);
+
             setSummary(
                 res.data
             );
 
-        } catch (err) {
+        } catch (err: any) {
 
             console.error(
                 "Failed to load dashboard summary",
                 err
             );
+            setError(err?.message || "Unable to load dashboard summary");
 
         } finally {
 
@@ -133,6 +141,31 @@ export default function Dashboard() {
                     <Activity size={40} style={{ marginBottom: '16px', opacity: 0.6 }} />
                     <p style={{ fontSize: '16px' }}>Loading dashboard...</p>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div style={{
+                padding: '32px',
+                color: 'var(--text)',
+                maxWidth: '720px'
+            }}>
+                <h1 style={{ marginBottom: '12px' }}>Dashboard Load Error</h1>
+                <p style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
+                    There was a problem fetching dashboard data.
+                </p>
+                <pre style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '14px',
+                    padding: '18px',
+                    overflowX: 'auto',
+                    color: 'var(--text)'
+                }}>
+                    {error}
+                </pre>
             </div>
         );
     }
