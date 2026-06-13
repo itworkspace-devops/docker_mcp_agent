@@ -4,6 +4,7 @@ from langchain_ollama import ChatOllama
 
 from backend.config.settings import settings
 from backend.agent.tool_router import route_query
+from backend.agent.prompts import build_docker_agent_prompt
 
 
 llm = ChatOllama(
@@ -41,41 +42,7 @@ def planner(state):
 
     # Fallback to LLM
 
-    prompt = f"""
-You are a Docker AI Agent.
-
-Return ONLY valid JSON.
-
-Available tools:
-
-docker_ps
-docker_images
-docker_inspect
-docker_logs
-docker_restart
-docker_start
-docker_stop
-docker_pull
-docker_info
-docker_ping
-docker_version
-incident_investigate
-
-User request:
-
-{query}
-
-Return EXACTLY:
-
-{{
-    "tool_name": "docker_ps",
-    "tool_args": {{}}
-}}
-
-No explanation.
-No markdown.
-Only JSON.
-"""
+    prompt = build_docker_agent_prompt(query)
 
     result = llm.invoke(
         prompt

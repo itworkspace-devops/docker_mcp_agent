@@ -2,6 +2,47 @@ from backend.mcp.docker_client import get_docker
 from backend.mcp.tools.base import success, failure
 
 
+def _find_container(query):
+
+    if not query:
+        raise ValueError(
+            "Container name filter is required"
+        )
+
+    query_lower = query.lower()
+    client = get_docker()
+
+    try:
+        return client.containers.get(query)
+    except Exception:
+        pass
+
+    matches = []
+    containers = client.containers.list(all=True)
+
+    for c in containers:
+        image_tags = c.image.tags or []
+        if (
+            query_lower in c.name.lower()
+            or query_lower in c.short_id.lower()
+            or any(query_lower in tag.lower() for tag in image_tags)
+        ):
+            matches.append(c)
+
+    if len(matches) == 1:
+        return matches[0]
+
+    if len(matches) == 0:
+        raise ValueError(
+            f"No containers matched '{query}'"
+        )
+
+    raise ValueError(
+        f"Multiple containers matched '{query}': "
+        + ", ".join(c.name for c in matches)
+    )
+
+
 def list_containers(arguments):
 
     try:
@@ -32,13 +73,60 @@ def list_containers(arguments):
         return failure(str(ex))
 
 
+def grep_containers(arguments):
+
+    try:
+
+        query = arguments.get(
+            "name"
+        ) or arguments.get(
+            "container"
+        )
+
+        if not query:
+            return failure(
+                "Container name filter is required"
+            )
+
+        query_lower = query.lower()
+        client = get_docker()
+
+        containers = client.containers.list(
+            all=True
+        )
+
+        matches = []
+
+        for c in containers:
+            image_tags = c.image.tags or []
+            if (
+                query_lower in c.name.lower()
+                or query_lower in c.short_id.lower()
+                or any(query_lower in tag.lower() for tag in image_tags)
+            ):
+                matches.append(
+                    {
+                        "id": c.short_id,
+                        "name": c.name,
+                        "status": c.status,
+                        "image": image_tags,
+                    }
+                )
+
+        return success(matches)
+
+    except Exception as ex:
+
+        return failure(str(ex))
+
+
 def inspect_container(arguments):
 
     try:
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         return success(container.attrs)
 
@@ -89,13 +177,13 @@ def start_container(arguments):
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         container.start()
 
         return success(
             {
-                "container": name,
+                "container": container.name,
                 "action": "started"
             }
         )
@@ -111,13 +199,13 @@ def stop_container(arguments):
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         container.stop()
 
         return success(
             {
-                "container": name,
+                "container": container.name,
                 "action": "stopped"
             }
         )
@@ -133,13 +221,13 @@ def restart_container(arguments):
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         container.restart()
 
         return success(
             {
-                "container": name,
+                "container": container.name,
                 "action": "restarted"
             }
         )
@@ -155,13 +243,13 @@ def remove_container(arguments):
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         container.remove(force=True)
 
         return success(
             {
-                "container": name,
+                "container": container.name,
                 "action": "removed"
             }
         )
@@ -182,7 +270,7 @@ def container_logs(arguments):
             100
         )
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         logs = container.logs(
             tail=tail
@@ -201,7 +289,7 @@ def container_stats(arguments):
 
         name = arguments["container"]
 
-        container = get_docker().containers.get(name)
+        container = _find_container(name)
 
         stats = container.stats(
             stream=False

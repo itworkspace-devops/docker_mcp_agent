@@ -1,15 +1,12 @@
 from backend.config.settings import settings
 
 from backend.approval.service import (
-    request_approval
-)
-
-from backend.approval.store import (
-    PENDING_APPROVALS
+    create_pending_approval,
+    remove_pending_approval,
+    request_approval,
 )
 
 from backend.approval.engine import (
-    create_execution_id,
     requires_approval,
 )
 
@@ -38,31 +35,26 @@ def approval_node(state):
             "approved": True,
         }
 
-    # CLI approval mode
+    execution_id = create_pending_approval(
+        tool_name,
+        tool_args,
+        origin=settings.approval_mode,
+    )
+
+    approved = False
+
     if settings.approval_mode == "cli":
 
         approved = request_approval(
             tool_name,
-            tool_args
+            tool_args,
+            execution_id=execution_id,
         )
 
-        return {
-            "approval_required": True,
-            "approved": approved,
-        }
-
-    # API / Teams approval mode
-    execution_id = create_execution_id()
-
-    PENDING_APPROVALS[
-        execution_id
-    ] = {
-        "tool_name": tool_name,
-        "tool_args": tool_args,
-    }
+        remove_pending_approval(execution_id)
 
     return {
         "approval_required": True,
-        "approved": False,
+        "approved": approved,
         "execution_id": execution_id,
     }

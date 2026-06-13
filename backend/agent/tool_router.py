@@ -17,6 +17,18 @@ def extract_host(query):
     )
     
 
+def _is_dockerfile_compose_request(query: str) -> bool:
+    return any(
+        keyword in query
+        for keyword in [
+            "dockerfile",
+            "docker-compose",
+            "docker compose",
+            "compose",
+        ]
+    )
+
+
 def route_query(
     query: str
 ) -> Optional[dict]:
@@ -168,6 +180,15 @@ def route_query(
     if (
         query.startswith("create ")
         and "container" in query
+        and not any(
+            keyword in query
+            for keyword in [
+                "dockerfile",
+                "docker-compose",
+                "docker compose",
+                "compose",
+            ]
+        )
     ):
 
         image = (
@@ -265,7 +286,17 @@ def route_query(
             }
         }    
 
-    if query.startswith("run "):
+    if query.startswith("run ") and not any(
+        keyword in query
+        for keyword in [
+            "dockerfile",
+            "docker-compose",
+            "docker compose",
+            "compose",
+            "build",
+            "generate",
+        ]
+    ):
 
         image = query.replace(
             "run ",
@@ -288,7 +319,7 @@ def route_query(
     # Container Actions
     # ==================================================
 
-    if query.startswith("restart "):
+    if query.startswith("restart ") and not _is_dockerfile_compose_request(query):
 
         container = query.replace(
             "restart ",
@@ -313,7 +344,7 @@ def route_query(
             }
         }
 
-    if query.startswith("stop "):
+    if query.startswith("stop ") and not _is_dockerfile_compose_request(query):
 
         container = query.replace(
             "stop ",
@@ -338,7 +369,7 @@ def route_query(
             }
         }
 
-    if query.startswith("start "):
+    if query.startswith("start ") and not _is_dockerfile_compose_request(query):
 
         container = query.replace(
             "start ",
@@ -363,7 +394,7 @@ def route_query(
             }
         }
 
-    if query.startswith("inspect "):
+    if query.startswith("inspect ") and not _is_dockerfile_compose_request(query):
 
         container = query.replace(
             "inspect ",
@@ -382,7 +413,7 @@ def route_query(
             }
         }
 
-    if query.startswith("logs "):
+    if query.startswith("logs ") and not _is_dockerfile_compose_request(query):
 
         container = query.replace(
             "logs ",
