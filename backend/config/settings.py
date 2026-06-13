@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     database_url: str = (
     "postgresql://postgres:postgres@localhost/docker_agent"
 )
+
+    secret_key: str = "CHANGE_THIS_SECRET_KEY"
     
     # API
     

@@ -76,9 +76,17 @@ def executor(state):
 
     try:
 
+        host_name = state.get(
+            "host_name"
+        )
+
         result = mcp.call(
+
             tool_name,
-            tool_args
+
+            tool_args,
+
+            host_name=host_name
         )
 
         audit_log(

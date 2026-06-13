@@ -67,3 +67,19 @@ def execute_remediation(
             "success": False,
             "error": str(ex),
         }
+        
+def execute_plan(plan):
+
+    tool_name = plan.get(
+        "tool_name"
+    )
+
+    tool_args = plan.get(
+        "tool_args",
+        {}
+    )
+
+    return mcp.call(
+        tool_name,
+        tool_args
+    )
