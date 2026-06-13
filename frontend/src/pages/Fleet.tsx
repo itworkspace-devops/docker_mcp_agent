@@ -104,7 +104,7 @@ export default function Fleet() {
 
     return (
 
-        <div>
+        <div className="page-shell">
 
             <h2>
                 Fleet Health Dashboard

@@ -77,6 +77,12 @@ from backend.api.routes.realtime import (
 from backend.api.routes.notifications import (
     router as notifications_router
 )
+from backend.api.routes.auth import (
+    router as auth_router
+)
+from backend.database.init_db import (
+    initialize_database
+)
 
 app = FastAPI(
     title="Docker AI Agent",
@@ -159,6 +165,12 @@ app.include_router(
     tags=["Findings"]
 )
 
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["Auth"]
+)
+
 # Docker Agent Query API
 app.include_router(
     docker_router,
@@ -208,6 +220,7 @@ app.include_router(
 @app.on_event("startup")
 def startup_event():
 
+    initialize_database()
     start_scheduler()
 
     print(

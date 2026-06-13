@@ -7,14 +7,17 @@ import {
     CheckCircle2,
     AlertCircle,
     Settings,
-    LogOut
+    LogOut,
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
-import {
-    Link
-} from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Sidebar() {
+    const authContext = useContext(AuthContext);
+    const auth = authContext?.auth;
+    const navigate = useNavigate();
 
     const mainLinks = [
         { path: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -30,12 +33,13 @@ export default function Sidebar() {
         { path: "/agent", icon: Bot, label: "Agent" },
     ];
 
+    const handleLogout = () => {
+        authContext?.logout();
+        navigate("/login");
+    };
+
     return (
-
-        <div
-            className="sidebar"
-        >
-
+        <div className="sidebar">
             <div>
                 <h2 style={{ marginBottom: '8px' }}>
                     🤖 Docker AI
@@ -53,7 +57,7 @@ export default function Sidebar() {
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {mainLinks.map(({ path, icon: Icon, label }) => (
-                    <Link 
+                    <Link
                         key={path}
                         to={path}
                         style={{ textDecoration: 'none', color: 'inherit' }}
@@ -61,13 +65,13 @@ export default function Sidebar() {
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '12px',
+                            gap: '10px',
                             color: 'var(--text-secondary)',
                             textDecoration: 'none',
-                            padding: '12px 16px',
+                            padding: '10px 14px',
                             borderRadius: '12px',
                             transition: 'all 0.3s ease',
-                            fontSize: '15px',
+                            fontSize: '14px',
                             fontWeight: '500',
                             borderLeft: '3px solid transparent',
                             cursor: 'pointer'
@@ -90,6 +94,43 @@ export default function Sidebar() {
                         </div>
                     </Link>
                 ))}
+                {auth?.role === "admin" && (
+                    <Link
+                        to="/users"
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            color: 'var(--text-secondary)',
+                            textDecoration: 'none',
+                            padding: '10px 14px',
+                            borderRadius: '12px',
+                            transition: 'all 0.3s ease',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            borderLeft: '3px solid transparent',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.color = 'var(--text)';
+                            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
+                            e.currentTarget.style.borderLeftColor = 'var(--primary)';
+                            e.currentTarget.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--text-secondary)';
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderLeftColor = 'transparent';
+                            e.currentTarget.style.transform = 'translateX(0)';
+                        }}
+                        >
+                            <Settings size={20} />
+                            <span>Users</span>
+                        </div>
+                    </Link>
+                )}
             </nav>
 
             <div style={{
@@ -100,7 +141,7 @@ export default function Sidebar() {
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {secondaryLinks.map(({ path, icon: Icon, label }) => (
-                    <Link 
+                    <Link
                         key={path}
                         to={path}
                         style={{ textDecoration: 'none', color: 'inherit' }}
@@ -108,13 +149,13 @@ export default function Sidebar() {
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '12px',
+                            gap: '10px',
                             color: 'var(--text-secondary)',
                             textDecoration: 'none',
-                            padding: '12px 16px',
+                            padding: '10px 14px',
                             borderRadius: '12px',
                             transition: 'all 0.3s ease',
-                            fontSize: '15px',
+                            fontSize: '14px',
                             fontWeight: '500',
                             borderLeft: '3px solid transparent',
                             cursor: 'pointer'
@@ -155,14 +196,14 @@ export default function Sidebar() {
                 <button style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    gap: '10px',
                     color: 'var(--text-secondary)',
                     background: 'transparent',
                     border: 'none',
-                    padding: '12px 16px',
+                    padding: '10px 14px',
                     borderRadius: '12px',
                     cursor: 'pointer',
-                    fontSize: '15px',
+                    fontSize: '14px',
                     fontWeight: '500',
                     transition: 'all 0.3s ease',
                     textAlign: 'left',
@@ -185,14 +226,14 @@ export default function Sidebar() {
                 <button style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
+                    gap: '10px',
                     color: '#ef4444',
                     background: 'transparent',
                     border: 'none',
-                    padding: '12px 16px',
+                    padding: '10px 14px',
                     borderRadius: '12px',
                     cursor: 'pointer',
-                    fontSize: '15px',
+                    fontSize: '14px',
                     fontWeight: '500',
                     transition: 'all 0.3s ease',
                     textAlign: 'left',
@@ -204,6 +245,7 @@ export default function Sidebar() {
                 onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
                 }}
+                onClick={handleLogout}
                 >
                     <LogOut size={20} />
                     <span>Logout</span>

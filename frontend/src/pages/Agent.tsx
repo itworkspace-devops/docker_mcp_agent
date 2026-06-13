@@ -40,13 +40,14 @@ export default function Agent() {
                         : msg
                 )
             );
-        } catch (err) {
+        } catch (err: any) {
+            const errorMessage = err?.response?.data?.detail || err?.message || "Failed to get response from agent";
             setMessages(prev =>
                 prev.map(msg =>
                     msg.id === userMessage.id
                         ? { 
                             ...msg, 
-                            response: { error: "Failed to get response from agent" }, 
+                            response: { error: errorMessage }, 
                             loading: false 
                           }
                         : msg
@@ -64,11 +65,12 @@ export default function Agent() {
     };
 
     return (
-        <div style={{
+        <div className="page-shell" style={{
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100vh - 140px)',
-            gap: '20px'
+            minHeight: 'calc(100vh - 210px)',
+            gap: '20px',
+            paddingBottom: '24px'
         }}>
             {/* Header */}
             <div style={{

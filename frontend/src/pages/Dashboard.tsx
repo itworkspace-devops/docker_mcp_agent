@@ -172,13 +172,13 @@ export default function Dashboard() {
 
     return (
 
-        <div>
+        <div className="page-shell">
 
             <h1 style={{ marginBottom: '8px' }}>
                 Dashboard Overview
             </h1>
             
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
                 Real-time monitoring of your Docker infrastructure
             </p>
 

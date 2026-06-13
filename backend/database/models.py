@@ -57,6 +57,12 @@ class User(Base):
         String
     )
 
+    password_changed = Column(
+        Boolean,
+        default=False,
+        server_default="false"
+    )
+
     created_at = Column(
         DateTime,
         default=datetime.utcnow

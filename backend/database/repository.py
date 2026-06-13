@@ -101,6 +101,81 @@ def get_user_by_username(
 
         db.close()
 
+
+def list_users():
+
+    db = SessionLocal()
+
+    try:
+
+        return db.query(User).all()
+
+    finally:
+
+        db.close()
+
+
+def create_user(
+    username,
+    password_hash,
+    role,
+    password_changed=False,
+):
+
+    db = SessionLocal()
+
+    try:
+
+        user = User(
+            username=username,
+            password_hash=password_hash,
+            role=role,
+            password_changed=password_changed,
+        )
+
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return user
+
+    finally:
+
+        db.close()
+
+
+def update_user_password(
+    username,
+    password_hash,
+    password_changed=True,
+):
+
+    db = SessionLocal()
+
+    try:
+
+        user = (
+            db.query(User)
+            .filter(User.username == username)
+            .first()
+        )
+
+        if not user:
+            return None
+
+        user.password_hash = password_hash
+        user.password_changed = password_changed
+
+        db.commit()
+        db.refresh(user)
+
+        return user
+
+    finally:
+
+        db.close()
+
+
 def create_baseline(
     container_name,
     image,
