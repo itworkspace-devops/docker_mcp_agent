@@ -13,14 +13,14 @@ import Findings from "./pages/Findings";
 import Compliance from "./pages/Compliance";
 import Drift from "./pages/Drift";
 import Agent from "./pages/Agent";
+import Incidents from "./pages/Incidents";
+import Approvals from "./pages/Approvals";
+import Notifications from "./pages/Notifications";
 
-import Incidents
-from "./pages/Incidents";
-
-<Route
-    path="/incidents"
-    element={<Incidents />}
-/>
+import "./styles/theme.css";
+import "./styles/layout.css";
+import "./styles/cards.css";
+import "./styles/tables.css";
 
 function App() {
 
@@ -61,6 +61,23 @@ function App() {
                         <Route
                             path="/drift"
                             element={<Drift />}
+                        />
+
+                        <Route
+                            path="/incidents"
+                            element={<Incidents />}
+                        />
+
+                        <Route
+                            path="/notifications"
+                            element={
+                                <Notifications />
+                            }
+                        />
+
+                        <Route
+                            path="/approvals"
+                            element={<Approvals />}
                         />
 
                         <Route

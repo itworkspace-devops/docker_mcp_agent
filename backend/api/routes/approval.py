@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from backend.approval.store import (
     PENDING_APPROVALS
@@ -16,7 +16,45 @@ mcp = MCPClient()
 @router.get("/pending")
 def pending():
 
-    return PENDING_APPROVALS
+    results = []
+
+    for execution_id, data in (
+        PENDING_APPROVALS.items()
+    ):
+
+        results.append({
+
+            "execution_id":
+                execution_id,
+
+            **data
+        })
+
+    return results
+
+@router.post("/{execution_id}/reject")
+def reject(
+    execution_id: str
+):
+
+    if execution_id not in PENDING_APPROVALS:
+
+        raise HTTPException(
+            404,
+            "Approval not found"
+        )
+
+    approval = PENDING_APPROVALS[
+        execution_id
+    ]
+
+    approval["approved"] = False
+
+    return {
+        "success": True,
+        "execution_id": execution_id,
+        "status": "rejected",
+    }
 
 
 @router.post("/approve/{execution_id}")

@@ -70,9 +70,28 @@ from backend.api.routes.compliance import (
     router as compliance_router
 )
 
+from backend.api.routes.realtime import (
+    router as realtime_router
+)
+
+from backend.api.routes.notifications import (
+    router as notifications_router
+)
+
 app = FastAPI(
     title="Docker AI Agent",
     version="1.0.0",
+)
+
+app.include_router(
+    notifications_router,
+    prefix="/notifications",
+    tags=["Notifications"]
+)
+
+app.include_router(
+    realtime_router,
+    tags=["Realtime"]
 )
 
 app.add_middleware(
