@@ -58,6 +58,7 @@ button:disabled {
     position: sticky;
     top: 0;
     height: 100vh;
+    z-index: 100;
 }
 
 .sidebar h2 {
@@ -99,6 +100,7 @@ button:disabled {
 
 .header {
     display: flex;
+    position: sticky;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
@@ -221,7 +223,8 @@ select {
 .form-row select {
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
+    /* background: rgba(255, 255, 255, 0.04); */
+    background: #0a0e27;
     border-radius: 14px;
     padding: 14px 16px;
     color: var(--text);
