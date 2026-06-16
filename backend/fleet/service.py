@@ -1,5 +1,5 @@
 from backend.database.repository import (
-    get_hosts
+    get_enabled_hosts
 )
 
 from backend.client.mcp_client import (
@@ -72,7 +72,7 @@ def fleet_health():
         )
     )
 
-    hosts = get_hosts()
+    hosts = get_enabled_hosts()
 
     for host in hosts:
         if host.name == "local":

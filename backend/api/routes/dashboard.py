@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from backend.database.repository import (
-    get_hosts,
+    get_enabled_hosts,
     get_findings,
     get_remediations,
 )
@@ -24,7 +24,7 @@ router = APIRouter()
 @router.get("/summary")
 def summary():
 
-    hosts = get_hosts()
+    hosts = get_enabled_hosts()
 
     findings = get_findings()
 

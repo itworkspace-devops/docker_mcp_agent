@@ -69,6 +69,9 @@ DOCKER_AGENT_PROMPT_TEMPLATE = """
 Available tools:
 {tool_list}
 
+Chat History:
+{history}
+
 Example 1:
 User: "Show me all running containers"
 Response:
@@ -121,10 +124,11 @@ Return only a single JSON object.
 """
 
 
-def build_docker_agent_prompt(user_request: str) -> str:
+def build_docker_agent_prompt(user_request: str, history: str = "") -> str:
     tool_list = "\n".join(DOCKER_AGENT_TOOL_LIST)
     return DOCKER_AGENT_PROMPT_TEMPLATE.format(
         system_prompt=DOCKER_AGENT_SYSTEM_PROMPT.strip(),
         tool_list=tool_list,
+        history=history,
         user_request=user_request.strip(),
     )

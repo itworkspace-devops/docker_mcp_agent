@@ -217,3 +217,17 @@ class Approval(Base):
         DateTime,
         default=datetime.utcnow,
     )
+
+class ChatSession(Base):
+    __tablename__ = "chat_sessions"
+    id = Column(String, primary_key=True)
+    title = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id = Column(Integer, primary_key=True)
+    session_id = Column(String)
+    role = Column(String)
+    content = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)

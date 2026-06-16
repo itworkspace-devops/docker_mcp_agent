@@ -16,23 +16,23 @@ router = APIRouter()
 
 mcp = MCPClient()
 
+from backend.database.repository import (
+    get_enabled_hosts
+)
 
-@router.get("/health")
-def health():
-
-    return fleet_health()
+# ...
 
 @router.get("/hosts")
 def fleet_hosts():
 
-    return get_hosts()
+    return get_enabled_hosts()
 
 
 @router.get("/containers")
 def fleet_containers():
 
     result = []
-    
+
     # Always include local host
     try:
         containers = mcp.call("docker_ps", host_name="local")
@@ -40,9 +40,10 @@ def fleet_containers():
     except Exception as ex:
         result.append({"host": "local", "error": str(ex)})
 
-    hosts = get_hosts()
-    
+    hosts = get_enabled_hosts()
+
     for host in hosts:
+
         if host.name == "local":
             continue # Already added
 

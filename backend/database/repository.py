@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from backend.database.db import (
     SessionLocal
 )
@@ -11,6 +13,8 @@ from backend.database.models import (
     DockerHost,
     User,
     ContainerBaseline,
+    ChatSession,
+    ChatMessage,
 )
 
 import json
@@ -627,4 +631,59 @@ def save_audit_log(
 
     finally:
 
+        db.close()
+
+def get_enabled_hosts():
+    db = SessionLocal()
+    try:
+        return db.query(DockerHost).filter(DockerHost.enabled == True).all()
+    finally:
+        db.close()
+
+def get_chat_sessions():
+    db = SessionLocal()
+    try:
+        cleanup_old_chats()
+        return db.query(ChatSession).order_by(ChatSession.created_at.desc()).all()
+    finally:
+        db.close()
+
+def get_chat_messages(session_id):
+    db = SessionLocal()
+    try:
+        return db.query(ChatMessage).filter(ChatMessage.session_id == session_id).order_by(ChatMessage.created_at.asc()).all()
+    finally:
+        db.close()
+
+def save_chat_message(session_id, role, content, title=None):
+    db = SessionLocal()
+    try:
+        session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+        if not session:
+            session = ChatSession(id=session_id, title=title or content[:50])
+            db.add(session)
+        elif title:
+            session.title = title
+        
+        message = ChatMessage(session_id=session_id, role=role, content=content)
+        db.add(message)
+        db.commit()
+        return message
+    finally:
+        db.close()
+
+def cleanup_old_chats():
+    db = SessionLocal()
+    try:
+        threshold = datetime.utcnow() - timedelta(days=15)
+        # Delete old messages
+        db.query(ChatMessage).filter(ChatMessage.created_at < threshold).delete()
+        # Delete sessions with no messages
+        sessions = db.query(ChatSession).all()
+        for s in sessions:
+            msg_count = db.query(ChatMessage).filter(ChatMessage.session_id == s.id).count()
+            if msg_count == 0:
+                db.delete(s)
+        db.commit()
+    finally:
         db.close()
