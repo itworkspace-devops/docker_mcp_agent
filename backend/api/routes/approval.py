@@ -109,7 +109,8 @@ def approve(
 
     result = mcp.call(
         task["tool_name"],
-        task["tool_args"]
+        task["tool_args"],
+        host_name=task.get("host_name")
     )
 
     return {

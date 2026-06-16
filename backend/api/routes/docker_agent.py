@@ -32,7 +32,8 @@ def docker_query(
     try:
         result = graph.invoke(
             {
-                "query": request.query
+                "query": request.query,
+                "origin": "ui"
             }
         )
     finally:

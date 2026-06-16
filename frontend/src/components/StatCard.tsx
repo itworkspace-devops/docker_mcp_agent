@@ -5,6 +5,7 @@ type Props = {
     value: string | number;
     gradientClass?: string;
     icon?: React.ReactNode;
+    onClick?: () => void;
 };
 
 const getIconForTitle = (title: string) => {
@@ -25,12 +26,32 @@ export default function StatCard({
     title,
     value,
     gradientClass,
-    icon
+    icon,
+    onClick
 }: Props) {
     const defaultIcon = getIconForTitle(title);
     
     return (
-        <div className={`stat-card ${gradientClass || ''}`}>
+        <div 
+            className={`stat-card ${gradientClass || ''}`}
+            onClick={onClick}
+            style={{ 
+                cursor: onClick ? 'pointer' : 'default',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+                if (onClick) {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3)';
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (onClick) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                }
+            }}
+        >
             <div className="stat-card-title">
                 {icon || defaultIcon}
                 <span>{title}</span>

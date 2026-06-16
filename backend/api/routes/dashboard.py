@@ -60,7 +60,7 @@ def summary():
     return {
 
         "hosts":
-            len(hosts),
+            len(health),
 
         "containers":
             total_containers,

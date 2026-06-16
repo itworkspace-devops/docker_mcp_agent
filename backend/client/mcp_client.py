@@ -23,26 +23,7 @@ class MCPClient:
         self,
         host_name=None
     ):
-
-        if not host_name:
-
-            return self.default_base_url
-
-        host = get_host_by_name(
-            host_name
-        )
-
-        if not host:
-
-            raise Exception(
-                f"Host not found: {host_name}"
-            )
-
-        return (
-
-            f"http://{host.host}:"
-            f"{host.port}"
-        )
+        return self.default_base_url
 
     def call(
 
@@ -54,6 +35,11 @@ class MCPClient:
 
         host_name=None
     ):
+        if arguments is None:
+            arguments = {}
+        
+        if host_name:
+            arguments["host_name"] = host_name
 
         payload = {
 
@@ -61,12 +47,12 @@ class MCPClient:
                 tool,
 
             "arguments":
-                arguments or {}
+                arguments
         }
 
         response = requests.post(
 
-            f"{self.get_base_url(host_name)}/tools/call",
+            f"{self.get_base_url()}/tools/call",
 
             json=payload,
 

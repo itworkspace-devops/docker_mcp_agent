@@ -1,6 +1,8 @@
 import {
     LayoutDashboard,
     Server,
+    Zap,
+    Activity,
     Shield,
     Bell,
     Bot,
@@ -28,7 +30,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
     const mainLinks = [
         { path: "/", icon: LayoutDashboard, label: "Dashboard" },
-        { path: "/fleet", icon: Server, label: "Fleet" },
+        { path: "/hosts", icon: Server, label: "Hosts" },
+        { path: "/fleet", icon: Activity, label: "Fleet Health" },
+        { path: "/containers", icon: Zap, label: "Containers" },
         { path: "/findings", icon: Shield, label: "Findings" },
         { path: "/compliance", icon: CheckCircle2, label: "Compliance" },
         { path: "/drift", icon: AlertCircle, label: "Drift" },

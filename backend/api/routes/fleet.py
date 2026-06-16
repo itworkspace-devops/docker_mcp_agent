@@ -32,39 +32,38 @@ def fleet_hosts():
 def fleet_containers():
 
     result = []
+    
+    # Always include local host
+    try:
+        containers = mcp.call("docker_ps", host_name="local")
+        result.append({"host": "local", "containers": containers})
+    except Exception as ex:
+        result.append({"host": "local", "error": str(ex)})
 
-    for host in get_hosts():
+    hosts = get_hosts()
+    
+    for host in hosts:
+        if host.name == "local":
+            continue # Already added
 
         try:
-
             containers = mcp.call(
-
                 "docker_ps",
-
                 host_name=host.name
             )
-
             result.append(
-
                 {
-
                     "host":
                         host.name,
-
                     "containers":
                         containers
                 }
             )
-
         except Exception as ex:
-
             result.append(
-
                 {
-
                     "host":
                         host.name,
-
                     "error":
                         str(ex)
                 }

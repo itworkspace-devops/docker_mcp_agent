@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, Loader, MessageCircle, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Send, Loader, MessageCircle, AlertCircle, CheckCircle2, ShieldAlert, XCircle } from "lucide-react";
 import { api } from "../services/api";
 
 interface Message {
@@ -36,7 +36,7 @@ export default function Agent() {
             setMessages(prev =>
                 prev.map(msg =>
                     msg.id === userMessage.id
-                        ? { ...msg, response: res.data, loading: false }
+                        ? { ...msg, response: res.data.response, loading: false }
                         : msg
                 )
             );
@@ -55,6 +55,30 @@ export default function Agent() {
             );
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleApproval = async (messageId: string, executionId: string, approved: boolean) => {
+        try {
+            const endpoint = approved 
+                ? `/approval/approve/${executionId}` 
+                : `/approval/${executionId}/reject`;
+            
+            const res = await api.post(endpoint);
+            
+            setMessages(prev =>
+                prev.map(msg =>
+                    msg.id === messageId
+                        ? { 
+                            ...msg, 
+                            response: approved ? (res.data.result || res.data) : { error: "Action rejected by user" }
+                          }
+                        : msg
+                )
+            );
+        } catch (err: any) {
+            console.error("Failed to process approval", err);
+            alert("Failed to process approval: " + (err.message || "Unknown error"));
         }
     };
 
@@ -83,7 +107,7 @@ export default function Agent() {
                     width: '40px',
                     height: '40px',
                     borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -176,7 +200,7 @@ export default function Agent() {
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'flex-start',
-                                    maxWidth: '70%'
+                                    maxWidth: '85%'
                                 }}>
                                     <div style={{
                                         width: '100%',
@@ -208,9 +232,86 @@ export default function Agent() {
                                                     }}>{msg.response.error}</p>
                                                 </div>
                                             </div>
+                                        ) : msg.response.action === 'approval_required' ? (
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '12px'
+                                            }}>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    gap: '10px',
+                                                    alignItems: 'center',
+                                                    color: '#f59e0b'
+                                                }}>
+                                                    <ShieldAlert size={20} />
+                                                    <span style={{ fontWeight: '600', fontSize: '15px' }}>Approval Required</span>
+                                                </div>
+                                                <div style={{
+                                                    padding: '12px',
+                                                    background: 'rgba(245, 158, 11, 0.05)',
+                                                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                                                    borderRadius: '8px',
+                                                    fontSize: '13px'
+                                                }}>
+                                                    <p style={{ margin: '0 0 8px 0', fontWeight: '500' }}>
+                                                        The agent wants to execute: <code style={{ color: '#f59e0b' }}>{msg.response.tool_name}</code>
+                                                    </p>
+                                                    <pre style={{
+                                                        margin: 0,
+                                                        fontSize: '12px',
+                                                        opacity: 0.8,
+                                                        overflowX: 'auto'
+                                                    }}>
+                                                        {JSON.stringify(msg.response.tool_args, null, 2)}
+                                                    </pre>
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                                                    <button 
+                                                        onClick={() => handleApproval(msg.id, msg.response.execution_id, true)}
+                                                        style={{
+                                                            flex: 1,
+                                                            padding: '10px',
+                                                            background: 'var(--success)',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '8px',
+                                                            cursor: 'pointer',
+                                                            fontWeight: '600',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: '8px'
+                                                        }}
+                                                    >
+                                                        <CheckCircle2 size={16} />
+                                                        Approve
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleApproval(msg.id, msg.response.execution_id, false)}
+                                                        style={{
+                                                            flex: 1,
+                                                            padding: '10px',
+                                                            background: '#ef4444',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '8px',
+                                                            cursor: 'pointer',
+                                                            fontWeight: '600',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            gap: '8px'
+                                                        }}
+                                                    >
+                                                        <XCircle size={16} />
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <div>
-                                                {msg.response.status === 'success' && (
+                                                {msg.response.success === true && (
                                                     <div style={{
                                                         display: 'flex',
                                                         gap: '8px',
@@ -231,7 +332,7 @@ export default function Agent() {
                                                     fontFamily: 'monospace',
                                                     fontSize: '12px',
                                                     color: 'var(--text)',
-                                                    maxHeight: '300px',
+                                                    maxHeight: '400px',
                                                     overflowY: 'auto',
                                                     lineHeight: '1.6',
                                                     whiteSpace: 'pre-wrap',

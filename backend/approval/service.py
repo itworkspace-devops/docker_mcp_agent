@@ -22,6 +22,7 @@ def create_pending_approval(
     tool_name,
     tool_args,
     origin="cli",
+    host_name=None,
 ):
 
     execution_id = create_execution_id()
@@ -29,6 +30,7 @@ def create_pending_approval(
     PENDING_APPROVALS[execution_id] = {
         "tool_name": tool_name,
         "tool_args": tool_args,
+        "host_name": host_name,
         "approved": None,
         "origin": origin,
         "status": "pending",

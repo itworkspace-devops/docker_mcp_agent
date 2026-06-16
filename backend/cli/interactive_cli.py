@@ -88,7 +88,8 @@ class DockerAgentCLI:
 
                 result = graph.invoke(
                     {
-                        "query": query
+                        "query": query,
+                        "origin": "cli"
                     }
                 )
 

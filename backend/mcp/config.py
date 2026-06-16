@@ -11,7 +11,7 @@ class MCPSettings(BaseSettings):
         extra="ignore"
     )
 
-    docker_host: str = "npipe:////./pipe/docker_engine"
+    docker_host: str = "none"
 
     mcp_host: str = "0.0.0.0"
 

@@ -43,6 +43,43 @@ def create_host(
     finally:
 
         db.close()
+
+def update_host_record(
+    host_id,
+    name,
+    host,
+    port,
+    enabled=True
+):
+    db = SessionLocal()
+    try:
+        obj = db.get(DockerHost, host_id)
+        if not obj:
+            return None
+        
+        obj.name = name
+        obj.host = host
+        obj.port = port
+        obj.enabled = enabled
+        
+        db.commit()
+        db.refresh(obj)
+        return obj
+    finally:
+        db.close()
+
+def delete_host_record(host_id):
+    db = SessionLocal()
+    try:
+        obj = db.get(DockerHost, host_id)
+        if not obj:
+            return False
+        
+        db.delete(obj)
+        db.commit()
+        return True
+    finally:
+        db.close()
         
 def get_hosts():
 

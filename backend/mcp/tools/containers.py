@@ -2,7 +2,7 @@ from backend.mcp.docker_client import get_docker
 from backend.mcp.tools.base import success, failure
 
 
-def _find_container(query):
+def _find_container(query, host_name=None):
 
     if not query:
         raise ValueError(
@@ -10,7 +10,7 @@ def _find_container(query):
         )
 
     query_lower = query.lower()
-    client = get_docker()
+    client = get_docker(host_name)
 
     try:
         return client.containers.get(query)
@@ -46,8 +46,8 @@ def _find_container(query):
 def list_containers(arguments):
 
     try:
-
-        client = get_docker()
+        host_name = arguments.get("host_name")
+        client = get_docker(host_name)
 
         containers = client.containers.list(
             all=True
@@ -62,7 +62,7 @@ def list_containers(arguments):
                     "id": c.short_id,
                     "name": c.name,
                     "status": c.status,
-                    "image": c.image.tags,
+                    "image": c.image.tags or [],
                 }
             )
 
@@ -76,7 +76,7 @@ def list_containers(arguments):
 def grep_containers(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         query = arguments.get(
             "name"
         ) or arguments.get(
@@ -89,7 +89,7 @@ def grep_containers(arguments):
             )
 
         query_lower = query.lower()
-        client = get_docker()
+        client = get_docker(host_name)
 
         containers = client.containers.list(
             all=True
@@ -123,10 +123,10 @@ def grep_containers(arguments):
 def inspect_container(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         return success(container.attrs)
 
@@ -138,8 +138,8 @@ def inspect_container(arguments):
 def run_container(arguments):
 
     try:
-
-        docker_client = get_docker()
+        host_name = arguments.get("host_name")
+        docker_client = get_docker(host_name)
 
         image = arguments["image"]
 
@@ -174,10 +174,10 @@ def run_container(arguments):
 def start_container(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         container.start()
 
@@ -196,10 +196,10 @@ def start_container(arguments):
 def stop_container(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         container.stop()
 
@@ -218,10 +218,10 @@ def stop_container(arguments):
 def restart_container(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         container.restart()
 
@@ -240,10 +240,10 @@ def restart_container(arguments):
 def remove_container(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         container.remove(force=True)
 
@@ -262,7 +262,7 @@ def remove_container(arguments):
 def container_logs(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
         tail = arguments.get(
@@ -270,7 +270,7 @@ def container_logs(arguments):
             100
         )
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         logs = container.logs(
             tail=tail
@@ -286,10 +286,10 @@ def container_logs(arguments):
 def container_stats(arguments):
 
     try:
-
+        host_name = arguments.get("host_name")
         name = arguments["container"]
 
-        container = _find_container(name)
+        container = _find_container(name, host_name)
 
         stats = container.stats(
             stream=False

@@ -13,6 +13,8 @@ import Header from "./components/Header";
 
 import Dashboard from "./pages/Dashboard";
 import Fleet from "./pages/Fleet";
+import Hosts from "./pages/Hosts";
+import Containers from "./pages/Containers";
 import Findings from "./pages/Findings";
 import Compliance from "./pages/Compliance";
 import Drift from "./pages/Drift";
@@ -86,6 +88,16 @@ function AppRoutes() {
                         <Route
                             path="/fleet"
                             element={<Fleet />}
+                        />
+
+                        <Route
+                            path="/hosts"
+                            element={<Hosts />}
+                        />
+
+                        <Route
+                            path="/containers"
+                            element={<Containers />}
                         />
 
                         <Route
