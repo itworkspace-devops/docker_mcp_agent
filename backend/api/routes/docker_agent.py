@@ -25,7 +25,30 @@ from backend.database.repository import (
     save_chat_message,
 )
 
-# ...
+def _render_assistant_message(result):
+    if isinstance(result, str):
+        return result
+    if isinstance(result, dict):
+        if result.get("message"):
+            return result["message"]
+        if result.get("success") is False:
+            return result.get("error") or "Operation failed."
+        data = result.get("data")
+        if isinstance(data, str):
+            return data
+        if isinstance(data, list):
+            return f"Returned {len(data)} item(s)."
+        if isinstance(data, dict):
+            if "tool_name" in data and "result" in data and isinstance(data["result"], (dict, list, str)):
+                return "Completed multi-step request."
+            parts = []
+            for key in ("container", "image", "network", "volume", "action", "risk", "free_port"):
+                if key in data and data[key] is not None:
+                    parts.append(f"{key}={data[key]}")
+            if parts:
+                return " | ".join(parts)
+            return "Operation completed."
+    return str(result)
 
 @router.post(
     "/query",
@@ -44,22 +67,24 @@ def docker_query(
     # Load history for context
     history = get_chat_messages(session_id)
     history_context = []
-    for msg in history[-10:]: # last 10 messages
-        history_context.append({"role": msg.role, "content": msg.content})
+    for msg in history[-6:]:
+        history_context.append({
+            "role": msg.role,
+            "content": msg.content[:500],
+        })
 
     try:
         result = graph.invoke(
             {
                 "query": request.query,
                 "origin": "ui",
-                "history": history_context
+                "history": history_context,
+                "host_name": request.host_name,
             }
         )
         
         # Save agent response
-        response_content = str(result["result"])
-        if isinstance(result["result"], dict) and "message" in result["result"]:
-             response_content = result["result"]["message"]
+        response_content = _render_assistant_message(result["result"])
              
         save_chat_message(session_id, "agent", response_content)
 

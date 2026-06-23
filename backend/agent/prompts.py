@@ -1,7 +1,7 @@
 DOCKER_AGENT_SYSTEM_PROMPT = """
 You are a Docker AI Agent system prompt.
 
-Your job is to translate a user Docker request into a single valid tool call.
+Your job is to translate a user Docker request into either a single valid tool call or a multi-step execution plan.
 Use only the available tool names exactly as listed.
 Do not add any explanation, markdown, or text outside the JSON object.
 Do not invent tools.
@@ -19,17 +19,42 @@ If the user asks to create a docker-compose stack or orchestrate multiple servic
 If the user asks about Docker system health, choose docker_info, docker_ping, or docker_version.
 If the user asks about images, choose docker_images.
 If the user asks to investigate a finding, choose incident_investigate.
+If the user asks about logs, crashes, restart loops, or OOM behavior, prefer fix_container_log_errors, detect_crash_loop, fix_crash_loop, detect_oom_containers, or get_memory_usage.
+If the user asks about ports, choose list_port_mappings, detect_port_conflicts, or find_free_port.
+If the user asks about cleanup, choose list_dangling_images, prune_images, prune_containers, prune_volumes, or system_prune.
+If the user asks about networks, choose docker_network_ls, docker_network_inspect, docker_network_create, docker_network_rm, docker_network_connect, docker_network_disconnect, or docker_network_prune.
+If the user asks about volumes, choose docker_volume_ls, docker_volume_inspect, docker_volume_create, docker_volume_rm, or docker_volume_orphans.
+If the user asks about security or image metadata, choose scan_image_vulnerabilities or list_image_labels.
+If the user asks about container health, choose check_container_health or list_all_health_statuses.
 
 The only valid response format is strict JSON.
 Return EXACTLY one JSON object with keys:
   - tool_name
   - tool_args
+  - tool_plan (optional, array of step objects)
   - host_name (optional)
+
+Rules:
+- If the user requests multiple actions in one sentence, prefer tool_plan.
+- Each item in tool_plan must be an object with tool_name and tool_args.
+- Keep the steps in execution order.
+- Use the exact image, port, container name, or host values mentioned by the user.
+- Do not invent defaults when the user already provided a value.
+- If the user says "and then", "then", "also", "after that", or similar chaining language, consider tool_plan.
 
 Example output:
 {
   "tool_name": "docker_inspect",
   "tool_args": {"container": "nginx"}
+}
+
+Multi-step example:
+{
+  "tool_plan": [
+    {"tool_name":"docker_pull","tool_args":{"image":"redis:alpine"}},
+    {"tool_name":"docker_run","tool_args":{"image":"redis:alpine","ports":{"9002/tcp":9002},"detach":true}},
+    {"tool_name":"docker_logs","tool_args":{"container":"redis-alpine","tail":100}}
+  ]
 }
 """
 
@@ -55,6 +80,36 @@ DOCKER_AGENT_TOOL_LIST = [
     "docker_generate_compose",
     "docker_execute_dockerfile",
     "docker_execute_compose",
+    "fix_container_log_errors",
+    "fix_log_text_errors",
+    "detect_crash_loop",
+    "fix_crash_loop",
+    "list_port_mappings",
+    "detect_port_conflicts",
+    "find_free_port",
+    "list_dangling_images",
+    "prune_images",
+    "prune_containers",
+    "prune_volumes",
+    "system_prune",
+    "docker_network_ls",
+    "docker_network_inspect",
+    "docker_network_create",
+    "docker_network_rm",
+    "docker_network_connect",
+    "docker_network_disconnect",
+    "docker_network_prune",
+    "docker_volume_ls",
+    "docker_volume_inspect",
+    "docker_volume_create",
+    "docker_volume_rm",
+    "docker_volume_orphans",
+    "scan_image_vulnerabilities",
+    "list_image_labels",
+    "check_container_health",
+    "list_all_health_statuses",
+    "detect_oom_containers",
+    "get_memory_usage",
     "docker_images",
     "docker_pull",
     "docker_info",
@@ -131,4 +186,34 @@ def build_docker_agent_prompt(user_request: str, history: str = "") -> str:
         tool_list=tool_list,
         history=history,
         user_request=user_request.strip(),
+    )
+
+
+DOCKER_AGENT_PLAN_VALIDATION_PROMPT = """
+You are validating a Docker execution plan.
+
+Original request:
+{user_request}
+
+Proposed plan:
+{plan_json}
+
+Return EXACTLY one JSON object with:
+- valid: true/false
+- tool_plan: corrected plan array (or the original plan if valid)
+- notes: short human-readable explanation
+
+Rules:
+- Keep the exact image, port, container name, and host values from the user request.
+- Do not invent defaults.
+- If a required step is missing, add it.
+- If a step is wrong, fix it.
+- If the plan is already correct, return it unchanged.
+"""
+
+
+def build_plan_validation_prompt(user_request: str, plan_json: str) -> str:
+    return DOCKER_AGENT_PLAN_VALIDATION_PROMPT.format(
+        user_request=user_request.strip(),
+        plan_json=plan_json.strip(),
     )

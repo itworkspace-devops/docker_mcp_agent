@@ -72,49 +72,36 @@ def executor(state):
     # Execute MCP Tool
     # ==================================================
 
+    tool_plan = state.get("tool_plan") or []
+    host_name = state.get("host_name")
+
+    def run_tool(tool_name, tool_args):
+        try:
+            result = mcp.call(tool_name, tool_args, host_name=host_name)
+            audit_log(action=tool_name, target=str(tool_args), status="success")
+            return result
+        except Exception as ex:
+            audit_log(action=tool_name, target=str(tool_args), status=f"failed: {str(ex)}")
+            return {"success": False, "error": str(ex)}
+
+    if tool_plan:
+        outputs = []
+        for step in tool_plan:
+            tool_name = step["tool_name"]
+            tool_args = step.get("tool_args", {})
+            result = run_tool(tool_name, tool_args)
+            outputs.append({
+                "tool_name": tool_name,
+                "tool_args": tool_args,
+                "result": result,
+            })
+            if not result.get("success", True):
+                break
+        return {"result": {"success": True, "message": "Completed multi-step request.", "data": outputs}}
+
     tool_name = state["tool_name"]
-
-    tool_args = state.get(
-        "tool_args",
-        {}
-    )
-
-    try:
-
-        host_name = state.get(
-            "host_name"
-        )
-
-        result = mcp.call(
-
-            tool_name,
-
-            tool_args,
-
-            host_name=host_name
-        )
-
-        audit_log(
-            action=tool_name,
-            target=str(tool_args),
-            status="success",
-        )
-
-        return {
-            "result": result
-        }
-
-    except Exception as ex:
-
-        audit_log(
-            action=tool_name,
-            target=str(tool_args),
-            status=f"failed: {str(ex)}",
-        )
-
-        return {
-            "result": {
-                "success": False,
-                "error": str(ex),
-            }
-        }
+    tool_args = state.get("tool_args", {})
+    if host_name and "host_name" not in tool_args:
+        tool_args = {**tool_args, "host_name": host_name}
+    result = run_tool(tool_name, tool_args)
+    return {"result": result}

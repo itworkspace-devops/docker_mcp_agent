@@ -558,4 +558,28 @@ def route_query(
                 {},
         }
 
+    if "crash loop" in query or "restart loop" in query:
+        return {
+            "tool_name": "detect_crash_loop",
+            "tool_args": {}
+        }
+
+    if "oom" in query or "out of memory" in query:
+        return {
+            "tool_name": "detect_oom_containers",
+            "tool_args": {}
+        }
+
+    if "port conflict" in query or "port collision" in query:
+        return {
+            "tool_name": "detect_port_conflicts",
+            "tool_args": {}
+        }
+
+    if "free port" in query:
+        return {
+            "tool_name": "find_free_port",
+            "tool_args": {}
+        }
+
     return None

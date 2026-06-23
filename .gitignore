@@ -3,3 +3,25 @@ venv
 docker_agent.db
 ./frontend/node_modules
 ./frontend/dist
+__pycache__
+
+build/
+dist/
+*.egg-info/
+
+# IDE files
+.vscode/
+.idea/
+
+venv/
+.venv/
+env/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env

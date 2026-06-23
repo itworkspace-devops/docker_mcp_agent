@@ -46,6 +46,60 @@ from .tools.drift import (
     drift_scan
 )
 
+from .tools.log_error_fixer import (
+    fix_container_log_errors,
+    fix_log_text_errors,
+    detect_crash_loop,
+    fix_crash_loop,
+)
+
+from .tools.port_conflict_resolver import (
+    list_port_mappings,
+    detect_port_conflicts,
+    find_free_port,
+)
+
+from .tools.image_cleaner import (
+    list_dangling_images,
+    prune_images,
+    prune_containers,
+    prune_volumes,
+    system_prune,
+)
+
+from .tools.network_manager import (
+    docker_network_ls,
+    docker_network_inspect,
+    docker_network_create,
+    docker_network_rm,
+    docker_network_connect,
+    docker_network_disconnect,
+    docker_network_prune,
+)
+
+from .tools.volume_manager import (
+    docker_volume_ls,
+    docker_volume_inspect,
+    docker_volume_create,
+    docker_volume_rm,
+    docker_volume_orphans,
+)
+
+from .tools.image_scanner import (
+    scan_image_vulnerabilities,
+    list_image_labels,
+)
+
+from .tools.health_checker import (
+    check_container_health,
+    list_all_health_statuses,
+)
+
+from .tools.oom_analyzer import (
+    detect_oom_containers,
+    get_memory_usage,
+)
+
 TOOL_REGISTRY = {
 
     # ==================================================
@@ -90,6 +144,36 @@ TOOL_REGISTRY = {
     "docker_generate_compose": generate_compose,
     "docker_execute_dockerfile": execute_dockerfile,
     "docker_execute_compose": execute_compose,
+    "fix_container_log_errors": fix_container_log_errors,
+    "fix_log_text_errors": fix_log_text_errors,
+    "detect_crash_loop": detect_crash_loop,
+    "fix_crash_loop": fix_crash_loop,
+    "list_port_mappings": list_port_mappings,
+    "detect_port_conflicts": detect_port_conflicts,
+    "find_free_port": find_free_port,
+    "list_dangling_images": list_dangling_images,
+    "prune_images": prune_images,
+    "prune_containers": prune_containers,
+    "prune_volumes": prune_volumes,
+    "system_prune": system_prune,
+    "docker_network_ls": docker_network_ls,
+    "docker_network_inspect": docker_network_inspect,
+    "docker_network_create": docker_network_create,
+    "docker_network_rm": docker_network_rm,
+    "docker_network_connect": docker_network_connect,
+    "docker_network_disconnect": docker_network_disconnect,
+    "docker_network_prune": docker_network_prune,
+    "docker_volume_ls": docker_volume_ls,
+    "docker_volume_inspect": docker_volume_inspect,
+    "docker_volume_create": docker_volume_create,
+    "docker_volume_rm": docker_volume_rm,
+    "docker_volume_orphans": docker_volume_orphans,
+    "scan_image_vulnerabilities": scan_image_vulnerabilities,
+    "list_image_labels": list_image_labels,
+    "check_container_health": check_container_health,
+    "list_all_health_statuses": list_all_health_statuses,
+    "detect_oom_containers": detect_oom_containers,
+    "get_memory_usage": get_memory_usage,
 
     "incident_investigate":
         incident_investigate,

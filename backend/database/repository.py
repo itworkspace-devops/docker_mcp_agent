@@ -643,7 +643,6 @@ def get_enabled_hosts():
 def get_chat_sessions():
     db = SessionLocal()
     try:
-        cleanup_old_chats()
         return db.query(ChatSession).order_by(ChatSession.created_at.desc()).all()
     finally:
         db.close()

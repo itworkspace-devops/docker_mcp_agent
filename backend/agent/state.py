@@ -18,6 +18,10 @@ class AgentState(TypedDict, total=False):
 
     tool_args: Dict[str, Any]
 
+    tool_plan: list[dict[str, Any]]
+
+    plan_index: int
+
     result: Dict[str, Any]
 
     error: Optional[str]

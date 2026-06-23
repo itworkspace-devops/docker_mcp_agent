@@ -1,6 +1,7 @@
 import docker
 from .config import settings
 from backend.database.repository import get_host_by_name
+from backend.database.repository import get_enabled_hosts
 
 _clients = {}
 
@@ -50,7 +51,16 @@ def get_docker(host_name=None):
             _clients[base_url] = docker.DockerClient(base_url=base_url, timeout=10)
         except Exception as e:
             print(f"Failed to initialize docker client for {base_url}: {e}")
-            # Don't cache failed clients, or maybe cache failure?
-            return docker.DockerClient(base_url=base_url, timeout=10) # Let it raise if it fails again
+            if not host_name or host_name == "local":
+                for host in get_enabled_hosts():
+                    if host.name == "local":
+                        continue
+                    try:
+                        fallback = get_docker(host.name)
+                        print(f"Falling back to host '{host.name}'")
+                        return fallback
+                    except Exception:
+                        continue
+            return docker.DockerClient(base_url=base_url, timeout=10)
 
     return _clients[base_url]
