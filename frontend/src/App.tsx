@@ -4,7 +4,8 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+import { Menu } from "lucide-react";
 
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Sidebar from "./components/Sidebar";
@@ -12,6 +13,8 @@ import Header from "./components/Header";
 
 import Dashboard from "./pages/Dashboard";
 import Fleet from "./pages/Fleet";
+import Hosts from "./pages/Hosts";
+import Containers from "./pages/Containers";
 import Findings from "./pages/Findings";
 import Compliance from "./pages/Compliance";
 import Drift from "./pages/Drift";
@@ -31,6 +34,20 @@ import "./styles/tables.css";
 function AppRoutes() {
     const authContext = useContext(AuthContext);
     const auth = authContext?.auth;
+    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768) {
+                setSidebarOpen(true);
+            } else {
+                setSidebarOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     if (!auth) {
         return (
@@ -53,9 +70,14 @@ function AppRoutes() {
 
     return (
         <div className="layout">
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+            
+            {window.innerWidth <= 768 && sidebarOpen && (
+                <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+            )}
+
             <div className="content">
-                <Header />
+                <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />
                 <Routes>
 
                         <Route
@@ -66,6 +88,16 @@ function AppRoutes() {
                         <Route
                             path="/fleet"
                             element={<Fleet />}
+                        />
+
+                        <Route
+                            path="/hosts"
+                            element={<Hosts />}
+                        />
+
+                        <Route
+                            path="/containers"
+                            element={<Containers />}
                         />
 
                         <Route

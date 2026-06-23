@@ -27,3 +27,7 @@ class AgentState(TypedDict, total=False):
     approved: bool
 
     execution_id: str
+    
+    origin: str
+    
+    history: list[dict[str, str]]

@@ -80,6 +80,9 @@ from backend.api.routes.notifications import (
 from backend.api.routes.auth import (
     router as auth_router
 )
+from backend.api.routes.chat import (
+    router as chat_router
+)
 from backend.database.init_db import (
     initialize_database
 )
@@ -169,6 +172,12 @@ app.include_router(
     auth_router,
     prefix="/auth",
     tags=["Auth"]
+)
+
+app.include_router(
+    chat_router,
+    prefix="/chat",
+    tags=["Chat"]
 )
 
 # Docker Agent Query API

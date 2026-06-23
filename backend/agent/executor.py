@@ -39,6 +39,11 @@ def executor(state):
             "approved",
             False
         ):
+            if state.get("origin") == "ui":
+                # For UI, we return the result from approval_node which contains action='approval_required'
+                return {
+                    "result": state.get("result")
+                }
 
             audit_log(
                 action=state.get(

@@ -17,6 +17,7 @@ llm = ChatOllama(
 def planner(state):
 
     query = state["query"]
+    history = state.get("history", [])
 
     # First try direct routing
     direct_tool = route_query(query)
@@ -42,7 +43,12 @@ def planner(state):
 
     # Fallback to LLM
 
-    prompt = build_docker_agent_prompt(query)
+    # Format history for prompt
+    history_str = ""
+    for msg in history:
+        history_str += f"{msg['role'].upper()}: {msg['content']}\n"
+
+    prompt = build_docker_agent_prompt(query, history=history_str)
 
     result = llm.invoke(
         prompt

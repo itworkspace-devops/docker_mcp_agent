@@ -1,5 +1,5 @@
 from backend.database.repository import (
-    get_hosts
+    get_enabled_hosts
 )
 
 from backend.client.mcp_client import (
@@ -10,6 +10,7 @@ mcp = MCPClient()
 
 
 def _count_containers_for_host(host_name=None, host_label="local"):
+    print(f"Hitting Containers for host {host_label}")
 
     host_status = {
         "host": host_label,
@@ -20,10 +21,22 @@ def _count_containers_for_host(host_name=None, host_label="local"):
     }
 
     try:
+        # containers = mcp.call(
+        #     "docker_ps",
+        #     host_name=host_name
+        # )
         containers = mcp.call(
-            "docker_ps",
-            host_name=host_name
+        "docker_ps",
+        {
+            "host_name": host_name
+        }
         )
+        # containers = mcp.call(
+        #     "docker_ps",
+        #     arguments=None,
+        #     host_name=host_name
+        # )
+        print(f"Containers for host {host_label}: {containers}")
 
         container_list = (
             containers.get(
@@ -49,19 +62,22 @@ def _count_containers_for_host(host_name=None, host_label="local"):
 
 def fleet_health():
 
-    hosts = get_hosts()
-
-    if not hosts:
-        return [
-            _count_containers_for_host(
-                host_name=None,
-                host_label="local"
-            )
-        ]
-
     result = []
+    
+    # Always include local host
+    result.append(
+        _count_containers_for_host(
+            host_name="local",
+            host_label="local"
+        )
+    )
+
+    hosts = get_enabled_hosts()
 
     for host in hosts:
+        if host.name == "local":
+            continue # Already added
+
         host_status = _count_containers_for_host(
             host_name=host.name,
             host_label=host.name,

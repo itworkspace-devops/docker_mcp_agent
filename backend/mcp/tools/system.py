@@ -3,13 +3,10 @@ from backend.mcp.tools.base import success, failure
 
 
 def docker_info(arguments):
-
     try:
-
-        client = get_docker()
-
+        host_name = arguments.get("host_name")
+        client = get_docker(host_name)
         info = client.info()
-
         return success(
             {
                 "server_version": info.get("ServerVersion"),
@@ -24,40 +21,30 @@ def docker_info(arguments):
                 "memory": info.get("MemTotal"),
             }
         )
-
     except Exception as ex:
-
         return failure(str(ex))
 
 
 def docker_ping(arguments):
-
     try:
-
-        client = get_docker()
-
+        host_name = arguments.get("host_name")
+        client = get_docker(host_name)
         result = client.ping()
-
         return success(
             {
                 "ping": result,
                 "status": "healthy"
             }
         )
-
     except Exception as ex:
-
         return failure(str(ex))
 
 
 def docker_version(arguments):
-
     try:
-
-        client = get_docker()
-
+        host_name = arguments.get("host_name")
+        client = get_docker(host_name)
         version = client.version()
-
         return success(
             {
                 "version": version.get("Version"),
@@ -70,7 +57,5 @@ def docker_version(arguments):
                 "kernel_version": version.get("KernelVersion"),
             }
         )
-
     except Exception as ex:
-
         return failure(str(ex))

@@ -123,6 +123,7 @@ def generate_compose(arguments):
 
 def execute_dockerfile(arguments):
     try:
+        host_name = arguments.get("host_name")
         request = arguments.get("request")
         output_dir = arguments.get("output_dir", ".")
         dockerfile_name = arguments.get("dockerfile_name", "Dockerfile")
@@ -147,7 +148,7 @@ def execute_dockerfile(arguments):
             if not generate_result["success"]:
                 return failure(generate_result["error"])
 
-        docker_client = get_docker()
+        docker_client = get_docker(host_name)
         build_result = docker_client.images.build(
             path=str(build_context),
             tag=tag,

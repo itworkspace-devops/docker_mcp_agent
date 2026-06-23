@@ -1,22 +1,32 @@
-HOSTS = {
+from backend.hosts.service import (
+    list_hosts,
+)
 
-    "local": {
-        "docker_host":
-            "npipe:////./pipe/docker_engine"
-    },
 
-    "dev": {
-        "docker_host":
-            "tcp://10.0.0.10:2375"
-    },
+def load_hosts():
 
-    "qa": {
-        "docker_host":
-            "tcp://10.0.0.11:2375"
-    },
+    hosts = {}
 
-    "prod": {
-        "docker_host":
-            "tcp://10.0.0.12:2375"
-    },
-}
+    for host in list_hosts():
+
+        if not host.enabled:
+            continue
+
+        hosts[
+            host.name
+        ] = {
+
+            "host":
+                host.host,
+
+            "port":
+                host.port,
+
+            "docker_host":
+                f"tcp://{host.host}:{host.port}",
+        }
+        print(f"Loaded host: {host.name} at {host.host}:{host.port}")
+    return hosts
+
+
+HOSTS = load_hosts()

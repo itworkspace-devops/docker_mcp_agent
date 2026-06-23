@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import StatCard from "../components/StatCard";
 import { api } from "../services/api";
@@ -19,7 +20,7 @@ interface DashboardSummary {
 }
 
 export default function Dashboard() {
-
+    const navigate = useNavigate();
     const [summary, setSummary] =
         useState<DashboardSummary | null>(
             null
@@ -192,6 +193,7 @@ export default function Dashboard() {
                     title="Hosts"
                     value={summary?.hosts ?? 0}
                     gradientClass="gradient-1"
+                    onClick={() => navigate("/hosts")}
                 />
 
                 <StatCard
@@ -200,18 +202,21 @@ export default function Dashboard() {
                         summary?.containers ?? 0
                     }
                     gradientClass="gradient-3"
+                    onClick={() => navigate("/containers", { state: { filter: "all" } })}
                 />
 
                 <StatCard
                     title="Running"
                     value={summary?.running ?? 0}
                     gradientClass="gradient-4"
+                    onClick={() => navigate("/containers", { state: { filter: "running" } })}
                 />
 
                 <StatCard
                     title="Stopped"
                     value={summary?.stopped ?? 0}
                     gradientClass="gradient-2"
+                    onClick={() => navigate("/containers", { state: { filter: "stopped" } })}
                 />
 
             </div>
@@ -228,6 +233,7 @@ export default function Dashboard() {
                         summary?.findings ?? 0
                     }
                     gradientClass="gradient-5"
+                    onClick={() => navigate("/findings")}
                 />
 
                 <StatCard
@@ -236,6 +242,7 @@ export default function Dashboard() {
                         summary?.remediations ?? 0
                     }
                     gradientClass="gradient-6"
+                    onClick={() => navigate("/approvals")}
                 />
 
                 <StatCard
@@ -244,6 +251,7 @@ export default function Dashboard() {
                         summary?.incidents ?? 0
                     }
                     gradientClass="gradient-2"
+                    onClick={() => navigate("/incidents")}
                 />
 
                 <StatCard
@@ -252,6 +260,7 @@ export default function Dashboard() {
                         summary?.drift_findings ?? 0
                     }
                     gradientClass="gradient-8"
+                    onClick={() => navigate("/drift")}
                 />
 
             </div>

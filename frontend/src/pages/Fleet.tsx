@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { api } from "../services/api";
 
 import StatCard from "../components/StatCard";
 
 export default function Fleet() {
-
+    const navigate = useNavigate();
     const [hosts, setHosts] =
         useState<any[]>([]);
-
+    console.log("Fleet hosts:", hosts);
     const [loading, setLoading] =
         useState(true);
 
@@ -120,6 +121,7 @@ export default function Fleet() {
                 <StatCard
                     title="Hosts"
                     value={totalHosts}
+                    onClick={() => navigate("/hosts")}
                 />
 
                 <StatCard
@@ -130,16 +132,19 @@ export default function Fleet() {
                 <StatCard
                     title="Containers"
                     value={totalContainers}
+                    onClick={() => navigate("/containers")}
                 />
 
                 <StatCard
                     title="Running"
                     value={totalRunning}
+                    onClick={() => navigate("/containers")}
                 />
 
                 <StatCard
                     title="Stopped"
                     value={totalStopped}
+                    onClick={() => navigate("/containers")}
                 />
 
             </div>

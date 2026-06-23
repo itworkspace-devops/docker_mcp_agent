@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
     # Docker
     # docker_host: str = "unix:///var/run/docker.sock"
-    docker_host: str = "npipe:////./pipe/docker_engine"
+    docker_host: str = "none"
 
 
 settings = Settings()
